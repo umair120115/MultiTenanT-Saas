@@ -96,7 +96,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DB_NAME'),#'pathology_b2yu',
-        'USER': os.getenv('DB_USER'),#'pathology_b2yu_user',
+        'USER': os.getenv('DB_USERNAME'),#'pathology_b2yu_user',
         'PASSWORD':os.getenv('DB_PASSWORD'),#'ZI4erb3umKWVUUMgt1l71w4B1BPPd7a2',
         'HOST': os.getenv('DB_HOST'),#'dpg-d1l3kn95pdvs73bfm87g-a.oregon-postgres.render.com',
         'PORT': os.getenv('DB_PORT',5432),

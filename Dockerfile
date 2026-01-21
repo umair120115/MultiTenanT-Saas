@@ -34,15 +34,21 @@
     
     # Security: Create a non-root user
     ARG UID=10001
+    # RUN adduser \
+    #     --disabled-password \
+    #     --gecos "" \
+    #     --home "/nonexistent" \
+    #     --shell "/sbin/nologin" \
+    #     --no-create-home \
+    #     --uid "${UID}" \
+    #     appuser
     RUN adduser \
-        --disabled-password \
-        --gecos "" \
-        --home "/nonexistent" \
-        --shell "/sbin/nologin" \
-        --no-create-home \
-        --uid "${UID}" \
-        appuser
-    
+    --disabled-password \
+    --gecos "" \
+    --home "/home/appuser" \ 
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    appuser
     WORKDIR /app
     
     # Install ONLY runtime dependencies
