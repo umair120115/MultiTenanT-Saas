@@ -86,13 +86,25 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),#'pathology_b2yu',
+        'USER': os.getenv('DB_USER'),#'pathology_b2yu_user',
+        'PASSWORD':os.getenv('DB_PASSWORD'),#'ZI4erb3umKWVUUMgt1l71w4B1BPPd7a2',
+        'HOST': os.getenv('DB_HOST'),#'dpg-d1l3kn95pdvs73bfm87g-a.oregon-postgres.render.com',
+        'PORT': os.getenv('DB_PORT',5432),
+        'OPTIONS': {
+            'sslmode': 'require',   # <--- THIS FIXES THE SSL ERROR
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -174,6 +186,7 @@ USE_TZ = True
 
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

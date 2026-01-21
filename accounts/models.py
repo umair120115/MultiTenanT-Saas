@@ -49,7 +49,6 @@ class Users(AbstractBaseUser):
     username = models.CharField( max_length=100, blank=True, null=True)
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=255, choices=ROLES, default='employee')
-    password = models.CharField(max_length=100)
     name = models.CharField(max_length=100, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     profileImage = models.ImageField(upload_to='profile/',blank=True, null=True)
