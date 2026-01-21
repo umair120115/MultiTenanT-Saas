@@ -41,6 +41,8 @@ urlpatterns = [
    
     path('admin/', admin.site.urls),
     path('path/', include('rest_framework.urls')),
+    path('path/accounts/',include('accounts.urls')),
+    path('path/companies/', include('companies.urls')),
     
     
     
