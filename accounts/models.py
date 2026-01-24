@@ -62,9 +62,6 @@ class Users(AbstractBaseUser):
     is_phoneverified= models.BooleanField(default=False)
     is_emailverified = models.BooleanField(default=False)
     profileCompleted = models.BooleanField(default=False)
-    is_hotel_owner =models.BooleanField(default=False)
-    is_restuarant_owner = models.BooleanField(default=False)
-    is_both = models.BooleanField(default=False)
     fcm_token = models.CharField(max_length=255, blank=True, null=True)
     latitude = models.CharField(max_length=255, blank=True, null=True)
     longitude = models.CharField(max_length=255, blank=True, null=True)
@@ -85,3 +82,6 @@ class Users(AbstractBaseUser):
 
     def has_perm(self, perm, obj=None):
         return True
+    def get_full_name(self):
+        full_name = f"{self.name}"
+        return full_name.strip()
