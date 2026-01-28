@@ -43,6 +43,7 @@ urlpatterns = [
     path('path/', include('rest_framework.urls')),
     path('path/accounts/',include('accounts.urls')),
     path('path/companies/', include('companies.urls')),
+    path('path/leads/', include('leads.urls')),
     
     
     

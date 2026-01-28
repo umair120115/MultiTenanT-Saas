@@ -2,16 +2,10 @@ from django.db import models
 import uuid
 from accounts.models import Users
 from decimal import Decimal
+from companies.models import Company
 # Create your models here.
 
-class LeadNotes(models.Model):
-    note = models.TextField(blank=True, null=True)
-    created_at =models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        db_table='lead_notes'
-        verbose_name='Lead Note'
-        verbose_name_plural ='Lead Notes'
 class Lead(models.Model):
     SOURCES=(
         ('manual','Manual') , #for manual entries from portal
@@ -31,7 +25,6 @@ class Lead(models.Model):
     handler = models.ForeignKey(Users,blank=True, null=True, on_delete=models.CASCADE, related_name='employeeLeads')
     value = models.DecimalField( max_digits=12, decimal_places=2,default=Decimal(0.00))
     expected_closure_date = models.DateField(blank=True, null=True)
-    update_notes = models.ManyToManyField(LeadNotes, related_name='leadNotes')
     description = models.TextField(blank=True, null=True)
     created_at =  models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -44,3 +37,21 @@ class Lead(models.Model):
         db_table = 'lead_table'
         verbose_name='Lead'
         verbose_name_plural='Leads'
+
+
+
+class UpdateLeadNotes(models.Model):
+
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='update_notes_leads')
+    note = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField( auto_now_add=True)
+
+    def __str__(self):
+        return self.lead.name + "Note"
+
+
+    class Meta:
+        db_table = 'lead_notes_table'
+        verbose_name = 'Update Lead Note'
+        verbose_name_plural = 'Update Lead Notes'
+        ordering = ['-created_at']
