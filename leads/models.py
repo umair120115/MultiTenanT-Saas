@@ -55,3 +55,12 @@ class UpdateLeadNotes(models.Model):
         verbose_name = 'Update Lead Note'
         verbose_name_plural = 'Update Lead Notes'
         ordering = ['-created_at']
+
+
+class TempCSVImport(models.Model):
+    file_name = models.CharField(max_length=255)
+    file_content = models.BinaryField() # Stores the file in the DB temporarily
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'temp_csv_imports'

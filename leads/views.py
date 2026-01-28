@@ -56,3 +56,42 @@ class LeadDetailView(APIView):
         except Lead.DoesNotExist:
             return Response({"detail":"Lead not found!"}, status=404)
 
+
+
+from rest_framework.parsers import MultiPartParser
+from rest_framework import status, permissions
+from .models import TempCSVImport
+from .tasks import process_csv_from_db
+
+class CSVUploadView(APIView):
+    parser_classes = [MultiPartParser]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, format=None):
+        file_obj = request.FILES.get('file')
+        
+        # 1. Basic Validation
+        if not file_obj:
+            return Response({"error": "No file uploaded"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not file_obj.name.endswith('.csv'):
+             return Response({"error": "File must be a CSV"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # 2. Save file bytes to the Database Buffer
+            # This is fast and works perfectly on Render/Docker
+            temp_file = TempCSVImport.objects.create(
+                file_name=file_obj.name,
+                file_content=file_obj.read()  # Reads the file into binary
+            )
+
+            # 3. Trigger the Background Task
+            # We pass the ID of the temp row and the User ID
+            process_csv_from_db.delay(temp_file.id, request.user.id)
+
+            return Response(
+                {"message": "File uploaded. Processing started in background."}, 
+                status=status.HTTP_202_ACCEPTED
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

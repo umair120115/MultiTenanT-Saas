@@ -64,8 +64,10 @@ kombu==5.3.7
 MarkupSafe==3.0.3
 msgpack==1.1.2
 multidict==6.6.4
+numpy==2.4.1
 oauthlib==3.3.1
 packaging==25.0
+pandas==3.0.0
 pillow==11.3.0
 prompt_toolkit==3.0.52
 propcache==0.3.2
