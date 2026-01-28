@@ -21,3 +21,28 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
 
         return data
+    
+
+
+from .models import Users
+
+class UserOnBoardingSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, style={'input_type':'password'})
+
+    class Meta:
+        model = Users
+        fields = ['username','name','email', 'password','role']
+        extra_kwargs={
+            'password':{'write_only':True},
+            'role':{'read_only':True}
+        }
+
+    def create(self, validated_data):
+        user = Users.objects.create_user(
+            username=validated_data['email'], 
+            email=validated_data['email'],
+            password=validated_data['password'],
+            name=validated_data.get('name'),
+            role='employee' # Force default role for security
+        )
+        return user
