@@ -18,22 +18,50 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-REDIS_URL=os.getenv("REDIS_URL")
+# REDIS_URL=os.getenv("REDIS_URL")
 
+# # 2. Celery Configuration
+# CELERY_BROKER_URL = REDIS_URL
+# CELERY_RESULT_BACKEND = REDIS_URL
+
+
+# # CRITICAL: Tell Celery to use SSL but ignore certificate verification
+# CELERY_BROKER_USE_SSL = {
+#     'ssl_cert_reqs': ssl.CERT_NONE
+# }
+# CELERY_REDIS_BACKEND_USE_SSL = {
+#     'ssl_cert_reqs': ssl.CERT_NONE
+# }
+
+# # 3. Standard Django Caching
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": REDIS_URL,
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "CONNECTION_POOL_KWARGS": {
+#                 "ssl_cert_reqs": ssl.CERT_NONE  # <--- Use ssl.CERT_NONE, not just None
+#             },
+#         }
+#     }
+# }
+
+
+# settings.py
+
+import ssl
+
+# 1. Replace with your actual Aiven Service URI
+# Make sure it starts with 'rediss://'
+REDIS_URL = os.getenv("REDIS_URL")
+load_dotenv()
+print("REDIS URL:",REDIS_URL)
 # 2. Celery Configuration
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_BROKER_URL = f"{REDIS_URL}?ssl_cert_reqs=none" 
+CELERY_RESULT_BACKEND = 'django-db'
 
-
-# CRITICAL: Tell Celery to use SSL but ignore certificate verification
-CELERY_BROKER_USE_SSL = {
-    'ssl_cert_reqs': ssl.CERT_NONE
-}
-CELERY_REDIS_BACKEND_USE_SSL = {
-    'ssl_cert_reqs': ssl.CERT_NONE
-}
-
-# 3. Standard Django Caching
+# 3. Cache Configuration (Django-Redis)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -41,8 +69,10 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {
-                "ssl_cert_reqs": ssl.CERT_NONE  # <--- Use ssl.CERT_NONE, not just None
+                "ssl_cert_reqs": ssl.CERT_NONE  # Creates an insecure SSL connection for dev
             },
+            # Prevent crashes if Aiven goes down
+            "IGNORE_EXCEPTIONS": False, 
         }
     }
 }
@@ -73,6 +103,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'drf_yasg',
+    'django_celery_results',
 
     'accounts',
     'leads',
