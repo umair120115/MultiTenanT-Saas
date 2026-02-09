@@ -23,7 +23,7 @@ class LeadListCreateView(generics.ListCreateAPIView):
         filters.OrderingFilter
     ]
     filterset_class = LeadFilter
-    search_fields = ['name', 'description', 'company__name'] # Allow search by text
+    search_fields = ['name', 'description'] # Allow search by text
     ordering_fields = ['value', 'created_at', 'expected_closure_date']
     ordering = ['-created_at'] # Default ordering
 
@@ -45,14 +45,28 @@ class LeadListCreateView(generics.ListCreateAPIView):
         serializer.save(handler=self.request.user)
 
 from rest_framework.response import Response
+from .serializers import LeadDetailSerializer
+from django.shortcuts import get_object_or_404
 class LeadDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    def get(self, request):
-        lead_id = self.kwargs.get('lead_id')
+    def get(self, request, id=None):
+        lead_id = self.kwargs.get('id')
         try:
             lead = Lead.objects.select_related('handler').get(id=lead_id)
-            serializer = LeadSerializer(lead)
+            serializer = LeadDetailSerializer(lead)
             return Response(serializer.data, status=200)
+        except Lead.DoesNotExist:
+            return Response({"detail":"Lead not found!"}, status=404)
+
+    def patch(self, request, id=None):
+        lead_id = self.kwargs.get('id')
+        try:
+            lead = Lead.objects.get_object_or_404(id=lead_id)
+            serializer = LeadDetailSerializer(lead, data= request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=200)
+            return Response(serializer.errors, status=400)
         except Lead.DoesNotExist:
             return Response({"detail":"Lead not found!"}, status=404)
 
@@ -98,3 +112,69 @@ class CSVUploadView(APIView):
         
 
 
+# leads/views.py
+from django.db.models import Sum, Count, Q
+from django.utils import timezone
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import permissions
+from datetime import timedelta
+from .models import Lead
+
+class LeadAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Base Query: All leads for this employee
+        qs = Lead.objects.filter(handler=user)
+
+        # 1. Aggregate Global Stats (The heavy lifting)
+        stats = qs.aggregate(
+            total_leads=Count('id'),
+            total_value=Sum('value'),
+            
+            # Status Counts
+            won_count=Count('id', filter=Q(status='success')),
+            lost_count=Count('id', filter=Q(status='failure')),
+            active_count=Count('id', filter=Q(status='inprogress')),
+            
+            # Value Counts
+            won_value=Sum('value', filter=Q(status='success')),
+            pipeline_value=Sum('value', filter=Q(status='inprogress')),
+        )
+
+        # 2. "Where do I lag?" - Expiring Soon Logic
+        # Leads active but expiring in next 3 days
+        three_days_hence = timezone.now().date() + timedelta(days=3)
+        expiring_leads = qs.filter(
+            status='inprogress', 
+            expected_closure_date__lte=three_days_hence,
+            expected_closure_date__gte=timezone.now().date()
+        ).count()
+
+        # 3. Calculate Win Rate
+        total_finished = (stats['won_count'] or 0) + (stats['lost_count'] or 0)
+        win_rate = 0
+        if total_finished > 0:
+            win_rate = (stats['won_count'] / total_finished) * 100
+
+        data = {
+            "summary": {
+                "total_pipeline_value": stats['pipeline_value'] or 0,
+                "total_secured_revenue": stats['won_value'] or 0,
+                "win_rate": round(win_rate, 1),
+                "total_leads": stats['total_leads']
+            },
+            "status_breakdown": [
+                {"name": "Won", "value": stats['won_count'] or 0, "color": "#4ade80"},
+                {"name": "Active", "value": stats['active_count'] or 0, "color": "#d4a373"},
+                {"name": "Lost", "value": stats['lost_count'] or 0, "color": "#ef4444"},
+            ],
+            "action_needed": {
+                "expiring_soon_count": expiring_leads
+            }
+        }
+        
+        return Response(data)
