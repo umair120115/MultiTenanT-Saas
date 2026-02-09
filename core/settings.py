@@ -60,6 +60,8 @@ print("REDIS URL:",REDIS_URL)
 # 2. Celery Configuration
 CELERY_BROKER_URL = f"{REDIS_URL}?ssl_cert_reqs=none" 
 CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_TASK_ACKS_LATE = True
 
 # 3. Cache Configuration (Django-Redis)
 CACHES = {
@@ -104,6 +106,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_celery_results',
+    'django_celery_beat',
 
     'accounts',
     'leads',
@@ -191,6 +194,13 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    # Throttling setting for preventing system abuse
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '5/minute',  # Max 5 requests per minute
+    }
 }
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=90),
