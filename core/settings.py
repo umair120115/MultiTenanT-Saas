@@ -62,6 +62,12 @@ CELERY_BROKER_URL = f"{REDIS_URL}?ssl_cert_reqs=none"
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_TASK_ACKS_LATE = True
+CELERY_BROKER_USE_SSL = {
+    'ssl_cert_reqs': ssl.CERT_NONE
+}
+CELERY_REDIS_BACKEND_USE_SSL = {
+    'ssl_cert_reqs': ssl.CERT_NONE
+}
 
 # 3. Cache Configuration (Django-Redis)
 CACHES = {
