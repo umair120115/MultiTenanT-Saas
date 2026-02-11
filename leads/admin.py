@@ -6,7 +6,7 @@ from .models import Lead , TempCSVImport, UpdateLeadNotes
 # admin.site.register(TempCSVImport)
 @admin.register(TempCSVImport)
 class TempCSVAdmin(admin.ModelAdmin):
-    list_display =('id', 'file','uploaded_at')
+    list_display =('id','uploaded_at')
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
     list_display = ('id','status')

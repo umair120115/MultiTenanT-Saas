@@ -47,7 +47,9 @@ class LeadListCreateView(generics.ListCreateAPIView):
 from rest_framework.response import Response
 from .serializers import LeadDetailSerializer
 from django.shortcuts import get_object_or_404
+from rest_framework.authentication import TokenAuthentication
 class LeadDetailView(APIView):
+    # authentication_classes=[TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, id=None):
         lead_id = self.kwargs.get('id')
@@ -178,3 +180,21 @@ class LeadAnalyticsView(APIView):
         }
         
         return Response(data)
+
+
+class LeadNotesView(APIView):
+    permission_classes=[permissions.IsAuthenticated]
+    def post(self, request):
+        lead_id = request.data.get('lead')
+        note = request.data.get('note')
+        if not lead_id or not note:
+            return Response({"error":"Lead id or note content is missing!"}, status=400)
+        try:
+            lead = Lead.objects.get(id=lead_id)
+            if request.user != lead.handler :  # currently only for handler can be adjusted as per requirement the authority 
+                return Response({"error":"You are not allowed to add notes to this lead!"}, status=403)
+            lead.update_notes_leads.create(note=note)
+            return Response({"message":"Note added successfully!"}, status=200)
+
+        except Lead.DoesNotExist:
+            return Response({"error":"Lead not found!"}, status=404)

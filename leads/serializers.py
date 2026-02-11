@@ -31,7 +31,7 @@ class LeadSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'source', 'status', 'value', 
             'expected_closure_date', 'description', 
-            'handler', 'handler_details', # Write ID, Read Details
+            'handler', 'handler_details','email','contact_number', # Write ID, Read Details
             # 'company', 
             # 'notes', # The Many-to-Many list
             'created_at', 'updated_at'
@@ -70,7 +70,7 @@ class LeadDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'source', 'status', 'value',
             'expected_closure_date', 'description',
-            'handler_details', 'notes'
+            'handler_details', 'notes','email','contact_number','created_at', 'updated_at'
         ]
 
     # 3. Implement the logic to fetch, sort, and serialize

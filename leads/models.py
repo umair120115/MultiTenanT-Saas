@@ -3,6 +3,7 @@ import uuid
 from accounts.models import Users
 from decimal import Decimal
 from companies.models import Company
+from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
 
 
@@ -21,6 +22,13 @@ class Lead(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(max_length=255, blank=True, null=True)
     source = models.CharField(max_length=255, choices=SOURCES , default='manual')
+    email = models.EmailField(blank=True, null=True)
+    contact_number = PhoneNumberField(
+        unique=False, 
+        null=True, 
+        blank=True, 
+        help_text="Enter phone number (e.g. +919876543210)"
+    )
     status = models.CharField(max_length=255, choices=STATUS , default='inprogress')
     handler = models.ForeignKey(Users,blank=True, null=True, on_delete=models.CASCADE, related_name='employeeLeads')
     value = models.DecimalField( max_digits=12, decimal_places=2,default=Decimal(0.00))

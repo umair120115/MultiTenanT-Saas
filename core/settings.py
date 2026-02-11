@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_celery_results',
     'django_celery_beat',
+    "phonenumber_field",
 
     'accounts',
     'leads',
@@ -239,11 +240,12 @@ CORS_ALLOWED_ORIGINS=[
 ]
 
 CSRF_TRUSTED_ORIGINS=[
+    "http://localhost:3000",
     
 ]
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SECURE = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
