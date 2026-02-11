@@ -34,6 +34,7 @@ django-celery-beat==2.8.1
 django-channels==0.7.0
 django-cors-headers==4.7.0
 django-filter==25.1
+django-phonenumber-field==8.4.0
 django-redis==6.0.0
 django-rest-framework==0.1.0
 django-storages==1.14.6
@@ -71,6 +72,7 @@ numpy==2.4.1
 oauthlib==3.3.1
 packaging==25.0
 pandas==3.0.0
+phonenumbers==9.0.23
 pillow==11.3.0
 prompt_toolkit==3.0.52
 propcache==0.3.2
