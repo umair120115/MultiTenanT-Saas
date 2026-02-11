@@ -1,33 +1,26 @@
 services:
-  # 1. The Web Server (Django)
   - type: web
-    name: core-web
-    env: python
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
-    startCommand: "gunicorn core.wsgi:application"
+    name: MultiTenant-SaaS
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "chmod +x render_start.sh && ./render_start.sh"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: REDIS_URL
-        sync: false  # This tells Render: "Ask me for this value in the dashboard"
+        value: 3.9.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: saas-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        sync: false # You will paste your Aiven URL here manually
 
-  # 2. The Chef (Celery Worker)
-  - type: worker
-    name: core-worker
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    # Linux/Render command (Do not use pool=solo here)
-    startCommand: "celery -A core worker --loglevel=info --concurrency=4"
-    envVars:
-      - key: REDIS_URL
-        sync: false  # Must match the Aiven URL used in web service
-
-  # 3. The Manager (Celery Beat)
-  - type: worker
-    name: core-beat
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "celery -A core beat --loglevel=info"
-    envVars:
-      - key: REDIS_URL
-        sync: false  # Must match the Aiven URL used in web service
+databases:
+  - name: saas-db
+    plan: free
+    databaseName: saas
+    user: admin
