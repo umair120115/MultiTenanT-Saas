@@ -72,11 +72,18 @@
     
     # Copy application code
     COPY . .
+
+    # 1. NEW: Explicitly create the staticfiles directory
+    RUN mkdir -p /app/staticfiles
     
     # Adjust permissions for non-root user
     # RUN chown -R appuser:appuser /app      #previous working
     # NEW: Make the script executable BEFORE changing ownership
     RUN chmod +x /app/run.sh
+
+
+    # 3. Adjust permissions for the non-root user so they own the new directory
+    RUN chown -R appuser:appuser /app
     
     # Switch to non-root user
     USER appuser
