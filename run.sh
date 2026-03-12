@@ -12,4 +12,4 @@ celery -A core worker --loglevel=info concurrency=1 &
 
 # 4. Start Gunicorn + Uvicorn in the foreground
 # 'exec' ensures this process handles system signals properly for graceful shutdowns
-exec gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --workers 1--bind 0.0.0.0:8000
+exec gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --workers 1 --bind 0.0.0.0:8000
