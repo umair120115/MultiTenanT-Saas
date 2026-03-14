@@ -10,7 +10,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import LeadSerializer
 from .filters import LeadFilter
 from .pagination import StandardResultsSetPagination
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 class LeadListCreateView(generics.ListCreateAPIView):
     serializer_class = LeadSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -43,6 +44,10 @@ class LeadListCreateView(generics.ListCreateAPIView):
         # Automatically assign the creator as the handler if needed
         # or simply save the object.
         serializer.save(handler=self.request.user)
+
+    @method_decorator(cache_page(60*2))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 from rest_framework.response import Response
 from .serializers import LeadDetailSerializer
