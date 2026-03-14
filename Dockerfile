@@ -79,7 +79,7 @@
     # Adjust permissions for non-root user
     # RUN chown -R appuser:appuser /app      #previous working
     # NEW: Make the script executable BEFORE changing ownership
-    RUN chmod +x /app/run.sh
+    # RUN chmod +x /app/run.sh
 
 
     # 3. Adjust permissions for the non-root user so they own the new directory
@@ -99,7 +99,7 @@
     #      "--access-logfile", "-", \
     #      "--error-logfile", "-"]
 
-    # CMD ["doppler", "run", "--", "sh", "-c", "python manage.py collectstatic --noinput && gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"]
+    CMD ["doppler", "run", "--", "sh", "-c", "python manage.py collectstatic --noinput && gunicorn core.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"]
 
 
-    CMD ["doppler", "run", "--", "/app/run.sh"]
+    # CMD ["doppler", "run", "--", "/app/run.sh"]
