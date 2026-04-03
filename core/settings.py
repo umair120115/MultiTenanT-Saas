@@ -58,32 +58,32 @@ REDIS_URL = os.getenv("REDIS_URL")
 load_dotenv()
 print("REDIS URL:",REDIS_URL)
 # 2. Celery Configuration
-CELERY_BROKER_URL = f"{REDIS_URL}?ssl_cert_reqs=none" 
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_TASK_ACKS_LATE = True
-CELERY_BROKER_USE_SSL = {
-    'ssl_cert_reqs': ssl.CERT_NONE
-}
-CELERY_REDIS_BACKEND_USE_SSL = {
-    'ssl_cert_reqs': ssl.CERT_NONE
-}
+# CELERY_BROKER_URL = f"{REDIS_URL}?ssl_cert_reqs=none" 
+# CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_TASK_ACKS_LATE = True
+# CELERY_BROKER_USE_SSL = {
+#     'ssl_cert_reqs': ssl.CERT_NONE
+# }
+# CELERY_REDIS_BACKEND_USE_SSL = {
+#     'ssl_cert_reqs': ssl.CERT_NONE
+# }
 
-# 3. Cache Configuration (Django-Redis)
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS": {
-                "ssl_cert_reqs": ssl.CERT_NONE  # Creates an insecure SSL connection for dev
-            },
-            # Prevent crashes if Aiven goes down
-            "IGNORE_EXCEPTIONS": False, 
-        }
-    }
-}
+# # 3. Cache Configuration (Django-Redis)
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": REDIS_URL,
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "CONNECTION_POOL_KWARGS": {
+#                 "ssl_cert_reqs": ssl.CERT_NONE  # Creates an insecure SSL connection for dev
+#             },
+#             # Prevent crashes if Aiven goes down
+#             "IGNORE_EXCEPTIONS": False, 
+#         }
+#     }
+# }
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
